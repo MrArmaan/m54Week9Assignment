@@ -1,7 +1,7 @@
-require(dotenv).config();
+require("dotenv").config();
 const express = require("express");
-const user = require("./users/models");
-const userRouter = require("./users/routes");
+const user = require("./backend/users/models");
+const userRouter = require("./backend/users/routes");
 
 const port = process.env.port || 5001;
 
