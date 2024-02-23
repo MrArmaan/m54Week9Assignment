@@ -18,21 +18,21 @@ const hashPass = async (req, res, next) => {
 
 const comparePass = async (req, res, next) => {
   try {
-    const user = await User.findOne({
-      where: { username: req.body.username },
-    });
+    const user = await User.findOne({ where: { username: req.body.username } });
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const matched = await bcrypt.compare(
+    const passwordMatch = await bcrypt.compare(
       req.body.password,
-      user.dataValues.password
+      user.password
     );
 
-    if (!matched) {
-      return res.status(401).json({ message: "Invalid" });
+    if (!passwordMatch) {
+      return res.status(401).json({ message: "Invalid username or password" });
     }
+
     const withoutPassword = {
       id: user.id,
       username: user.username,
@@ -40,10 +40,11 @@ const comparePass = async (req, res, next) => {
     };
 
     req.user = withoutPassword;
-
-    res.status(200).json({ message: "Login successful", user: req.user });
+    next();
   } catch (error) {
-    res.status(501).json({ message: error.message, error: error });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
